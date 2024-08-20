@@ -44,3 +44,18 @@ class PostDetail(APIView):
         post = Post.objects.get(post_id=post_id)
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TagList(APIView):
+    def get(self, request):
+        tags = Tag.objects.all()
+        serializer = TagSerializer(tags, many=True)
+        return Response(serializer.data)
+
+
+class TagRelatedPosts(APIView):
+    def get(self, request, tag):
+        tag_obj = Tag.objects.get(in_english=tag)
+        posts = tag_obj.posts_of.all()
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)

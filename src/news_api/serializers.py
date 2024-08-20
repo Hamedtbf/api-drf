@@ -9,6 +9,8 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
+    tags = TagSerializer(many=True)
+
     class Meta:
         model = Post
-        exclude = ['id']
+        fields = ['post_id', 'title', 'content', 'tags']

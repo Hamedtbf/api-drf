@@ -1,5 +1,2 @@
 /chromedriver-linux64/
-/src/news_api/migrations/
-/src/db.sqlite3
-/src/manage.py
 /src/news_api/logic/

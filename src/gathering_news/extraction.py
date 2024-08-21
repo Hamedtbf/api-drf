@@ -104,11 +104,3 @@ def extract_post_data(url):
     tags = extract_tags(soup)
 
     return post_id, title, content, tags
-
-
-if __name__ == '__main__':
-    urls = []
-    for page_number in range(1, 5):
-        urls.extend(extract_urls(page_number))
-    for url in urls:
-        data = extract_post_data(url)

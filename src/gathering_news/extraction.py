@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC  # Import EC co
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-def extract_urls():
+def extract_urls(page_number):
     logging.basicConfig(level=logging.INFO)
     # Setup Selenium
     chrome_options = Options()
@@ -22,31 +22,32 @@ def extract_urls():
 
     urls = []
     try:
-        for page_number in range(2, 5):  # Adjust the range as needed
+        error_raised = True
+        while error_raised:  # Adjust the range as needed
             url = f'https://www.zoomit.ir/archive/?sort=Newest&publishPeriod=All&readingTimeRange=All&pageNumber={page_number}'
             logging.info(f"Loading page {url}")
             try:
                 driver.get(url)
+                error_raised = False
             except Exception as e:
                 logging.error(f"Failed to load {url}: {e}")
-                continue
 
-            # Wait and extract links
-            WebDriverWait(driver, 30).until(
-                EC.presence_of_all_elements_located((By.TAG_NAME, 'a'))
-            )
-            links = driver.find_elements(By.XPATH, "//a[starts-with(@href, 'https://www.zoomit.ir/')]")
+        # Wait and extract links
+        WebDriverWait(driver, 30).until(
+            EC.presence_of_all_elements_located((By.TAG_NAME, 'a'))
+        )
+        links = driver.find_elements(By.XPATH, "//a[starts-with(@href, 'https://www.zoomit.ir/')]")
 
-            before = len(urls)
+        before = len(urls)
 
-            for link in links:
-                if re.match(r'^https://www.zoomit.ir/\w+(-\w+)*/.+$', link.get_attribute('href')):
-                    urls.append(link.get_attribute('href'))
+        for link in links:
+            if re.match(r'^https://www.zoomit.ir/\w+(-\w+)*/\d+-.+$', link.get_attribute('href')):
+                urls.append(link.get_attribute('href'))
 
-            after = len(urls)
+        after = len(urls)
 
-            logging.info(f"Extracted {after - before} URLs from {url}")
-            time.sleep(3)
+        logging.info(f"Extracted {after - before} URLs from {url}")
+        time.sleep(1)
 
     finally:
         driver.quit()
@@ -93,6 +94,7 @@ def extract_post_data(url):
             response.raise_for_status()
             error_raised = False
         except HTTPError as er:
+            time.sleep(5)
             print(f'{er}\n retrying\n')
     soup = BeautifulSoup(response.text, 'html.parser', multi_valued_attributes=None)
 
@@ -104,5 +106,9 @@ def extract_post_data(url):
     return post_id, title, content, tags
 
 
-if __name__ == '__main':
-    urls = extract_urls()
+if __name__ == '__main__':
+    urls = []
+    for page_number in range(1, 5):
+        urls.extend(extract_urls(page_number))
+    for url in urls:
+        data = extract_post_data(url)

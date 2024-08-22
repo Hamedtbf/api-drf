@@ -13,7 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 def update_database():
     urls = []
-    for page_number in range(1, 5):
+    for page_number in range(1, 10):
         urls.extend(extract_urls(page_number))
 
     logging.basicConfig(level=logging.INFO)
@@ -43,8 +43,6 @@ def update_database():
     logging.info(f'new posts count: {new}')
     logging.info(f'duplicate posts count: {dup}')
     logging.info(f'posts count after updating API: {before + new}')
-
-
 
 
 if __name__ == '__main__':

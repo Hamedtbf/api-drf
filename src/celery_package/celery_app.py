@@ -1,10 +1,15 @@
 from celery import Celery
+from gathering_news.main import update_database
 
-# Create a Celery instance
 app = Celery('extraction')
 
 # Load configuration from a separate file or directly here
 app.config_from_object('celery_package.celery_config')
 
-# Discover and register tasks from other modules
-app.autodiscover_tasks(['gathering_news'])
+
+@app.task
+def scrape_news():
+    update_database()
+
+
+app.tasks.register(scrape_news)

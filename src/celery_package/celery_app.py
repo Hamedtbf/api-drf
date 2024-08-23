@@ -13,8 +13,8 @@ def scrape_news():
 app.config_from_object('celery_package.celery_config')
 
 app.conf.beat_schedule = {
-    'add-every-12-hours': {
+    'add-every-30-seconds': {
         'task': 'celery_package.celery_app.scrape_news',
-        'schedule': 12 * 60 * 60,
+        'schedule': 30,
     },
 }

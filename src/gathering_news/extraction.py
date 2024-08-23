@@ -1,4 +1,5 @@
 import logging
+import os.path
 import re
 import time
 import requests
@@ -17,7 +18,10 @@ def extract_urls(page_number):
     # Setup Selenium
     chrome_options = Options()
     chrome_options.add_argument("--headless")
-    webdriver_service = Service('/home/hamedtbf/Desktop/zoomit-sim/chromedriver-linux64/chromedriver')
+    chrome_options.add_argument("--no-sandbox")  # Required for Docker
+    chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
+    webdriver_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) + '/chromedriver-linux64/chromedriver'
+    webdriver_service = Service(webdriver_dir)
     driver = webdriver.Chrome(service=webdriver_service, options=chrome_options)
 
     urls = []

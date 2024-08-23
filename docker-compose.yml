@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  django:
+    build: .
+    working_dir: /app/src
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - DEBUG=1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+
+  celery_worker:
+    build: .
+    working_dir: /app/src
+    command: celery -A celery_package.celery_app worker -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+
+  celery_beat:
+    build: .
+    working_dir: /app/src
+    command: celery -A celery_package.celery_app beat -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
